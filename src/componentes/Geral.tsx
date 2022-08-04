@@ -1,4 +1,9 @@
-import { Button, Grid, Link, Typography } from "@material-ui/core";
+import {
+    Link as RouterLink,
+} from 'react-router-dom';
+import { Box, Card, CircularProgress, List, ListItem, Paper } from "@material-ui/core";
+import { useEffect, useState } from "react";
+import api from "../services/api";
 // eslint-disable-next-line flowtype/require-valid-file-annotation
 // @flow 
 type Props = {
@@ -8,21 +13,49 @@ type Props = {
 
 
 export const Geral = (props: Props) => {
-    return (
-        <div> 
-<Typography>
-    
-    <Button>
-        <Link href="http://jsonplaceholder.typicode.com/posts?id=1">Aqui vai o link.</Link>
-    </Button>
+    const [Posts, setPosts] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
 
-</Typography>
-            <Grid container> 
-            <Grid item xs={12} sm={6}>Cabeçalho</Grid>
-            <Grid item xs={12} sm={6}>Corpo
-            </Grid>
-                Agora vai, será?...
-            </Grid>
-        </div>
-    );
+    async function getPostsData() {
+        try {
+            setIsLoading(true);
+            const { data } = await api.get(`/`);
+            setPosts(data);
+            setIsLoading(false);
+        }
+        catch (_e) {
+            console.log("Error: ", _e);
+        }
+    }
+
+    useEffect(() => {
+        getPostsData();
+    }, [])
+
+
+
+
+    return (
+        <>
+            <Box>
+                        { isLoading && (<CircularProgress/>)   }
+                            </Box>
+            <Card>
+                <Paper>
+                    <Box>
+                        <List>
+                            {
+                                Posts.map((post, key) => (
+                                    <ListItem>
+                                        <RouterLink to={'/${post.id}'} >{'post.title'}</RouterLink>
+                                    </ListItem>
+                                ))
+                            }
+
+                        </List>
+                    </Box>
+                </Paper>
+            </Card>
+        </>
+    )
 };
